@@ -1,0 +1,1 @@
+BazarIQ: faqat analyst.py va index.html fayllarini GitHub repository asosiy papkasida almashtiring. tests/test_new_chat_context_button.py ixtiyoriy. Render deploy latest commit. API kalitni GitHubga yuklamang. Yangi chat tugmasi faqat kontekstga bog‘liq xato yuz berganda chiqadi; savol yangi chat maydoniga ko‘chadi, avtomatik yuborilmaydi.

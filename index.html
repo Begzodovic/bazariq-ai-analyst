@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="uz" data-build="live-translation-v3-20261105">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BazarIQ</title>
+<style>
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+
+  :root {
+    --uzex-primary: #023F87;   /* Congress Blue — UZEX asosiy rangi */
+    --uzex-light: #82AFFF;     /* Malibu — UZEX och ko'k */
+    --uzex-dark: #012a5c;      /* Primary'ning quyuqroq varianti */
+    --bg-page: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --border: #E2E8F0;
+    --success: #16A34A;
+    --danger: #DC2626;
+  }
+
+  body {
+    background: var(--bg-page);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: var(--text-primary);
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh;
+    background: var(--bg-card);
+    border-radius: 16px;
+    display: flex;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  /* ===== CHAP SIDEBAR ===== */
+  .sidebar {
+    width: 280px;
+    background: #F1F5F9;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--uzex-primary);
+    margin-bottom: 30px;
+    padding-left: 8px;
+  }
+
+  .sidebar-logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--uzex-primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+  }
+
+  .new-chat-btn {
+    background: var(--uzex-primary);
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-bottom: 24px;
+    color: white;
+  }
+  .new-chat-btn:hover { background: var(--uzex-dark); }
+
+  .history-section {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .history-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 16px 8px 8px;
+  }
+
+  .history-item {
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .history-item:hover { background: #E2E8F0; color: var(--text-primary); }
+  .history-item.active {
+    background: var(--uzex-primary);
+    color: white;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: #CBD5E1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .user-info { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+  /* ===== O'NG TOMON (Chat) ===== */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    position: relative;
+  }
+
+  .chat-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .chat-title { font-size: 16px; font-weight: 700; color: var(--uzex-primary); }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .chat-messages::-webkit-scrollbar { width: 6px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+
+  .message-row {
+    display: flex;
+    gap: 16px;
+    max-width: 85%;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .message-row.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  .bot-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #F1F5F9;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  
+  .user-avatar-chat {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--uzex-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .message-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .bubble {
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+
+  .message-row.ai .bubble {
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    border-top-left-radius: 2px;
+  }
+
+  .message-row.user .bubble {
+    background: var(--uzex-primary);
+    color: #ffffff;
+    border-top-right-radius: 2px;
+  }
+
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    color: #166534;
+    font-size: 11px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .message-row.ai.no-data .bubble {
+    background: #FEF2F2;
+    border-color: #FECACA;
+    color: #991B1B;
+  }
+  .message-row.ai.no-data .source-badge {
+    background: #FEF2F2;
+    border-color: #FECACA;
+    color: #991B1B;
+  }
+
+  .timestamp {
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  .message-row.user .timestamp { text-align: right; }
+
+  /* ===== INPUT MAYDONI ===== */
+  .chat-input-container {
+    padding: 20px 30px 30px;
+    background: var(--bg-card);
+  }
+
+  .input-wrapper {
+    background: #FFFFFF;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: 0.2s;
+  }
+  .input-wrapper:focus-within {
+    border-color: var(--uzex-light);
+    box-shadow: 0 0 0 3px rgba(130, 175, 255, 0.2);
+  }
+
+  .input-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    resize: none;
+    font-family: inherit;
+    background: transparent;
+    color: var(--text-primary);
+    padding-top: 8px;
+    max-height: 120px;
+  }
+  textarea::placeholder { color: var(--text-secondary); }
+
+  .send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
+    background: var(--uzex-primary);
+    color: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: 0.2s;
+  }
+  .send-btn:hover { background: var(--uzex-dark); }
+
+  .input-bottom {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .action-chip {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #FFFFFF;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+  }
+  .action-chip:hover { 
+    background: #F8FAFC; 
+    border-color: var(--uzex-light); 
+    color: var(--uzex-primary);
+  }
+
+  @media (max-width: 900px) {
+    .app-container { height: 100vh; border-radius: 0; border: none; }
+    .sidebar { display: none; }
+    .chat-messages { padding: 20px; }
+    .chat-input-container { padding: 15px; }
+  }
+  .chat-area,.message-content,.chat-messages,.bubble,textarea{min-width:0}.sidebar{flex-shrink:0}.history-item{width:100%;border:0;text-align:left;background:transparent}.history-item span{overflow:hidden;text-overflow:ellipsis}.sidebar-bottom{align-items:center}.user-info small{display:block;font-weight:400;color:var(--text-secondary)}.chat-header{gap:12px}.controls{display:flex;align-items:center;gap:10px}.lang{display:flex;background:#f1f5f9;border-radius:7px;padding:3px}.lang button,.mobile-menu{border:0;background:transparent;color:#526277;font-size:12px;font-weight:600;padding:6px 9px;border-radius:5px;cursor:pointer}.lang button[aria-pressed=true]{background:white;color:var(--uzex-primary);box-shadow:0 1px 4px #163b641f}.mobile-menu{display:none}.bubble{overflow-wrap:anywhere;white-space:pre-wrap}.message-content{max-width:100%}.message-row{flex-shrink:0}.timestamp{font-variant-numeric:tabular-nums}.source-badge{width:fit-content}.evidence{font-size:12px;min-width:0}.evidence summary{cursor:pointer;color:var(--uzex-primary);padding:6px 0}.evidence pre{background:#eef3fa;color:#173757;white-space:pre-wrap;overflow-wrap:anywhere;padding:9px;border-radius:5px}.evidence p{margin:5px 0;overflow-wrap:anywhere}.table-scroll{max-height:230px;overflow:auto;border:1px solid var(--border);border-radius:6px}.table-scroll table{border-collapse:collapse;font-size:12px;width:100%}th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}th{background:#edf3fa;position:sticky;top:0}button:focus-visible,summary:focus-visible{outline:3px solid var(--uzex-light);outline-offset:2px}button:disabled{opacity:.45;cursor:default}.send-btn:active,.action-chip:active,.new-chat-btn:active{transform:scale(.96)}.pending{display:flex;align-items:center;gap:9px;color:var(--text-secondary)}.dots{display:inline-flex;gap:3px}.dots i{width:5px;height:5px;border-radius:50%;background:var(--uzex-primary);animation:bounce 1s ease-in-out infinite}.dots i:nth-child(2){animation-delay:.14s}.dots i:nth-child(3){animation-delay:.28s}@keyframes bounce{50%{transform:translateY(-4px);opacity:.5}}.chat-area{min-height:0}.ai.no-data .bubble{border-left:3px solid #db5656}.backdrop{display:none}.bot-avatar svg,.sidebar-logo-icon svg,.user-avatar-chat svg,.send-btn svg,.history-item svg,.new-chat-btn svg,.action-chip svg,.mobile-menu svg,.user-avatar svg{width:19px;height:19px;flex:none}.bot-avatar{color:var(--uzex-primary)}.note{font-size:12px;color:var(--text-secondary)}.send-btn{transition:transform .15s ease,background .2s}.action-chip:hover{transform:translateY(-1px)}.chat-title{margin-right:auto}.app-container{position:relative}.sidebar-logo-icon{box-shadow:inset 0 -7px 12px #00295730}.sidebar-bottom .user-info{overflow-wrap:anywhere}.chat-messages{scrollbar-gutter:stable}.bubble p+p{margin-top:6px}
+  @media(max-width:900px){body{padding:0}.app-container{height:100dvh}.sidebar{display:flex;position:absolute;z-index:3;inset:0 auto 0 0;max-width:83vw;visibility:hidden;transform:translateX(-105%);transition:transform .2s,visibility .2s}.app-container.open .sidebar{visibility:visible;transform:none}.mobile-menu{display:flex;color:var(--uzex-primary);padding:5px}.app-container.open .backdrop{display:block;position:absolute;inset:0;background:#10263d59;z-index:2;border:0}.chat-header{padding:14px 16px}.message-row{max-width:96%;gap:8px}.chat-messages{padding:16px 12px}.chat-input-container{padding:10px 12px max(12px,env(safe-area-inset-bottom))}.action-chip{padding:5px 8px;font-size:11px}.input-bottom{gap:5px}.bot-avatar,.user-avatar-chat{height:30px;width:30px}.bubble{padding:10px 12px}.chat-title{font-size:14px}}
+  .message-row:not(.arrive){animation:none}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style></head><body>
+<div class="app-container" id="shell">
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-logo"><span class="sidebar-logo-icon" data-icon="bank"></span>BazarIQ</div>
+<button class="new-chat-btn" id="newChat"><span data-icon="plus"></span><span data-t="newChat"></span></button>
+<nav class="history-section"><div class="history-title" data-t="history"></div><div id="history"></div></nav>
+<div class="sidebar-bottom"><span class="user-avatar" data-icon="database"></span><div class="user-info"><span data-t="register"></span><small id="coverage"></small></div></div>
+</aside><button class="backdrop" id="backdrop" aria-label="×"></button>
+<main class="chat-area"><header class="chat-header"><button class="mobile-menu" id="menu" aria-controls="sidebar" aria-expanded="false" data-icon="menu"></button><h1 class="chat-title" data-t="title"></h1><div class="lang"><button id="uz">UZ</button><button id="ru">RU</button></div></header>
+<div class="chat-messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+<form class="chat-input-container" id="form"><div class="input-wrapper"><div class="input-top"><textarea id="userInput" rows="1" maxlength="1500" required></textarea><button class="send-btn" id="sendBtn" type="submit" data-icon="send"></button></div><div class="input-bottom" id="chips"></div></div></form>
+</main></div>
+<script>
+"use strict";
+const words={
+ uz:{title:"BazarIQ · Birja bitimlari",newChat:"Yangi chat",history:"Suhbatlar",register:"Xakaton reyestri",welcome:"Assalomu alaykum! Men BazarIQ assistentiman. Qaysi bitim, tovar yoki broker bo‘yicha ma’lumot kerak? Javobni xakaton reyestridan tekshiraman.",hint:"Birja bitimlari haqida savol yozing…",send:"Yuborish",menu:"Suhbatlarni ochish",wait:"Savolingizni tekshiryapman",source:"Manba",sql:"Hisoblash usuli va SQL",check:"Nazorat hisobi",cap:"Dastlabki 100 qator ko‘rsatilgan.",network:"Serverga ulanib bo‘lmadi. Ulanishni tekshirib, savolni qayta yuboring.",error:"Javobni tekshirib bo‘lmadi. Qayta urinib ko‘ring.",empty:"Mazkur so‘rov bo‘yicha natija topilmadi.",retry:"Savol bo‘yicha hisobni tasdiqlab bo‘lmadi. Yangi chatda sinab ko‘ring; natija qaytmasa, savolni aniqlashtirish kerak bo‘lishi mumkin.",newChatHint:"Yangi chatda savol qayta yuborishga tayyor turadi. Oldingi hudud yoki brokerlar kerak bo‘lsa, ularning ro‘yxati ham eslatiladi.",tryFresh:"Yangi chatda sinash",unavailable:"Mazkur savolga javob berish uchun reyestrda yetarli ma’lumot topilmadi.",provider:"Hozir AI xizmatidan javob olinmadi. Savolni yangi chatda sinab ko‘rishingiz mumkin; xizmat vaqtincha ishlamasa, keyinroq urinib ko‘ring.",limit:"So‘rovlar ko‘payib ketdi. Birozdan keyin urinib ko‘ring.",translating:"Javob tarjima qilinmoqda…",translationError:"Tarjima vaqtincha ishlamadi. Tilni qayta tanlang.",chips:["Paxta bo‘yicha bitimlar","Brokerlar","Dollar kursi","Shartnoma"],prompts:["2025-yilda paxta xomashyosi (хлопок-сырец) bo‘yicha nechta bitim qayd etilgan?","Xaridor tomonida eng ko‘p bitimda qatnashgan 5 ta brokerning nomi, kodi va bitimlar sonini ko‘rsating.","Reyestrdagi eng oxirgi USD kursi qaysi sanaga tegishli va necha so‘m?","Shartnoma raqami bo‘yicha tovar nomi, valyutasi va sotuvchisini topib bering."]},
+ ru:{title:"BazarIQ · Биржевые сделки",newChat:"Новый чат",history:"Чаты",register:"Реестр хакатона",welcome:"Здравствуйте! Я ассистент BazarIQ. Что вы хотите узнать о сделках, товарах или брокерах? Я проверю сведения по реестру хакатона.",hint:"Задайте вопрос о биржевых сделках…",send:"Отправить",menu:"Открыть список чатов",wait:"Проверяю ваш вопрос",source:"Источник",sql:"Расчёт и SQL",check:"Контрольный расчёт",cap:"Показаны первые 100 строк.",network:"Не удалось подключиться к серверу. Проверьте соединение и повторите вопрос.",error:"Не удалось проверить ответ. Повторите попытку.",empty:"По данному запросу результаты не найдены.",retry:"Не удалось подтвердить расчёт по реестру. Попробуйте новый чат; при повторной ошибке уточните запрос.",newChatHint:"В новом чате вопрос будет подготовлен повторно. Если нужны ранее выбранные регионы или брокеры, их список добавится.",tryFresh:"Попробовать в новом чате",unavailable:"В реестре недостаточно данных, чтобы ответить на этот вопрос.",provider:"Сейчас AI не ответил. Попробуйте задать вопрос в новом чате; если сервис недоступен, повторите позже.",limit:"Сейчас много запросов. Повторите попытку позже.",translating:"Перевод ответа…",translationError:"Перевод временно недоступен. Выберите язык снова.",chips:["Сделки с хлопком","Брокеры","Курс доллара","Контракт"],prompts:["Сколько сделок по хлопку-сырцу зарегистрировано в 2025 году?","Покажи названия, коды и число сделок пяти брокеров с наибольшим числом сделок на стороне покупателя.","Каковы дата и значение последнего курса доллара в реестре?","Найди товар, валюту и продавца по номеру контракта."]}
+};
+const shapes={bank:'<path d="M3 9l9-5 9 5M3 10h18M5 20h14M7 12v5m5-5v5m5-5v5"/>',plus:'<path d="M12 5v14m-7-7h14"/>',menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',database:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v13c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0"/>',bot:'<rect x="3" y="7" width="18" height="13" rx="4"/><path d="M12 3v4M8 12h1m6 0h1m-7 4h6"/>',user:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0114 0"/>',send:'<path d="m3 10 18-7-6 18-3-7-9-4Zm9 4 9-11"/>',chat:'<path d="M4 4h16v12H9l-5 4z"/>',chart:'<path d="M4 3v17h17M8 15v-3m5 3V8m5 7V5"/>',brokers:'<circle cx="8" cy="9" r="3"/><path d="M2 20a6 6 0 0112 0m0-14a3 3 0 010 6m3 2a6 6 0 014 6"/>',rate:'<path d="M4 7h15l-3-3m4 13H5l3 3"/>',doc:'<path d="M5 3h10l4 4v14H5zM9 12h6m-6 4h6"/>'};
+const $=id=>document.getElementById(id);
+function node(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=String(text);return n}
+function icon(key){const e=node("span");e.setAttribute("aria-hidden","true");e.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+shapes[key]+'</svg>';return e}
+document.querySelectorAll("[data-icon]").forEach(el=>el.append(icon(el.dataset.icon)));
+const makeChat=()=>({id:crypto.randomUUID(),turns:[],draft:""});
+let chats=[makeChat()],active=chats[0],lang="uz",coverage=[];
+const busy=new Set();
+// Only the current tab stores chat history. Credentials are never part of this state.
+try{const old=JSON.parse(sessionStorage.getItem("uzex.chat.v1"));if(old&&Array.isArray(old.chats)&&old.chats.length){
+ chats=old.chats.filter(c=>typeof c.id==="string"&&Array.isArray(c.turns));active=chats.find(c=>c.id===old.id)||chats[0];
+ if(!active){active=makeChat();chats=[active]}lang=old.lang==="ru"?"ru":"uz"}}catch{}
+function save(){try{sessionStorage.setItem("uzex.chat.v1",JSON.stringify({id:active.id,lang,chats}))}catch{}}
+const input=$("userInput");
+function drawer(on){$("shell").classList.toggle("open",on);$("menu").setAttribute("aria-expanded",String(on))}
+function choose(c){active.draft=input.value;active=c;drawer(false);input.value=c.draft||"";resize();refresh();save();input.focus()}
+function menuList(){const list=$("history");list.replaceChildren();for(const c of chats){const b=node("button","history-item"+(active===c?" active":""));
+ const title=c.turns[0]?.question||words[lang].newChat;b.title=title;b.append(icon("chat"),node("span","",title));b.onclick=()=>choose(c);list.append(b)}}
+function row(role,text,when,tone=""){const wrap=node("article","message-row "+role+" "+tone);
+ const av=node("div",role==="ai"?"bot-avatar":"user-avatar-chat");av.append(icon(role==="ai"?"bot":"user"));
+ const content=node("div","message-content"),bubble=node("div","bubble",text);content.append(bubble);
+ if(when)content.append(node("time","timestamp",new Date(when).toLocaleTimeString(lang==="ru"?"ru-RU":"uz-UZ",{hour:"2-digit",minute:"2-digit"})));
+ wrap.append(av,content);return {wrap,bubble,content}}
+// Display translations are separate from immutable SQL result objects.
+const knownRU={"Hudud":"Регион","Broker":"Брокер","Broker nomi":"Название брокера","Tovar":"Товар","Sana":"Дата","Mutlaq farq":"Абсолютная разница","Farq (ta)":"Разница (шт.)","Foiz o‘zgarishi (%)":"Изменение (%)","O‘zgarish (%)":"Изменение (%)","O‘zgarish (foiz punkt)":"Изменение (п.п.)","2024-yil ulushi (%)":"Доля за 2024 год (%)","2025-yil ulushi (%)":"Доля за 2025 год (%)","Toshkent shahri":"город Ташкент","Toshkent viloyati":"Ташкентская область","Namangan viloyati":"Наманганская область","Buxoro viloyati":"Бухарская область","Samarqand viloyati":"Самаркандская область","Andijon viloyati":"Андижанская область","Farg‘ona viloyati":"Ферганская область","Navoiy viloyati":"Навоийская область","Xorazm viloyati":"Хорезмская область","Qashqadaryo viloyati":"Кашкадарьинская область","Surxondaryo viloyati":"Сурхандарьинская область","Jizzax viloyati":"Джизакская область","Sirdaryo viloyati":"Сырдарьинская область","Qoraqalpog‘iston Respublikasi":"Республика Каракалпакстан"};
+const knownUZ=Object.fromEntries(Object.entries(knownRU).map(([k,v])=>[v,k]));
+function quickLabel(value,target){if(typeof value!=="string")return value;
+ const gloss=target==="ru"?knownRU:knownUZ;
+ if(gloss[value])return gloss[value];
+ if(target==="ru")return value.replace(/(20\d\d)-yil/g,"$1 год").replace(/bitimlar soni/gi,"количество сделок").replace(/bekor qilingan/gi,"отменённые сделки").replace(/ulushi/gi,"доля").replace(/foiz punkt/gi,"п.п.");
+ return value.replace(/(20\d\d) год/g,"$1-yil").replace(/Количество сделок/gi,"Bitimlar soni").replace(/Отменённые сделки/gi,"Bekor qilingan bitimlar");
+}
+function labelsFrom(r){
+ const found=new Set();
+ for(const record of (r.rows||[]).slice(0,100))for(const val of Object.values(record)){
+  if(typeof val==="string"&&val.length<=140&&/[A-Za-zА-Яа-яЁёЎўҒғҚқҲҳ]/.test(val)&&!/^(?:[A-Z0-9_-]{2,}|\d+[./:-]\d+)$/.test(val))found.add(val);
+  if(found.size>=80)return [...found];
+ }
+ return [...found];
+}
+function localized(r){return r.localized?.[lang]||null}
+function table(r){const outer=node("div","table-scroll"),tab=node("table"),translation=localized(r);
+ const header=tab.createTHead().insertRow();
+ for(let i=0;i<r.columns.length;i++){const col=r.columns[i];header.append(node("th","",translation?.columns?.[i]||quickLabel(col,lang)))}
+ const labels=translation?.labels||[];const originalLabels=labelsFrom(r);
+ const labelMap=new Map(originalLabels.map((v,i)=>[v,labels[i]||quickLabel(v,lang)]));
+ const body=tab.createTBody();for(const item of r.rows){const tr=body.insertRow();for(const col of r.columns){const v=item[col];tr.insertCell().textContent=typeof v==="string"?(labelMap.get(v)||quickLabel(v,lang)):(v??"—")}}
+ outer.append(tab);return outer}
+const translatingChats=new Set();
+async function translateVisible(){
+ const c=active,target=lang,key=c.id+":"+target;if(translatingChats.has(key))return;
+ const pending=c.turns.filter(t=>["ok","clarify"].includes(t.result?.status)&&t.result.lang!==target&&!t.result.localized?.[target]);
+ if(!pending.length)return;
+ translatingChats.add(key);
+ try{
+  // One request translates text, column names and row labels without querying the registry again.
+  for(let start=0;start<pending.length;start+=8){const batch=pending.slice(start,start+8);
+   const items=batch.map(t=>({answer:String(t.result.answer||""),columns:t.result.columns||[],labels:labelsFrom(t.result)}));
+   const resp=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lang:target,items})});
+   if(!resp.ok)throw new Error("translation request failed: "+resp.status);
+   const data=await resp.json();if(!Array.isArray(data.items)||data.items.length!==batch.length)throw new Error("invalid translation response");
+   batch.forEach((t,i)=>{t.result.localized=t.result.localized||{};t.result.localized[target]=data.items[i]});
+   save();if(active===c&&lang===target)renderMessages();
+  }
+ }catch(err){if(active===c&&lang===target){
+  for(const t of pending)if(!t.result.localized?.[target])t.translationFailed=target;
+  renderMessages();
+ }}finally{translatingChats.delete(key)}
+}
+function prepareFreshQuestion(question,sourceChat){
+ const q=String(question||"");
+ const reference=/(?:^|[^\p{L}])(shu|shular|oldingi|avvalgi|endi|ular|ushbu|этих|эти|этого|предыдущ|теперь|те же|those|previous|same)(?=$|[^\p{L}])/iu.test(q);
+ if(!reference)return q.slice(0,1500);
+ const prior=[...sourceChat.turns].reverse().find(x=>x.result?.status==="ok"&&Array.isArray(x.result.rows)&&x.result.rows.length>0);
+ if(!prior)return q.slice(0,1500);
+ const result=prior.result;
+ const rows=result.rows.slice(0,20);
+ const selected=[];
+ const nameCol=Object.keys(rows[0]||{}).find(k=>/hudud|region|регион|broker|брокер|nomi|name|товар|tovar|mahsulot/i.test(k) && rows.every(r=>typeof r[k]==="string"));
+ if(nameCol){for(const row of rows){if(row[nameCol]&&!selected.includes(row[nameCol]))selected.push(row[nameCol]);}}
+ const codes=Array.isArray(result.selected_set)?result.selected_set.filter(x=>typeof x==="string"&&x.length<64):[];
+ const dates=[...(prior.question.match(/\b(?:19|20)\d{2}\b/g)||[])].slice(0,3);
+ const parts=[];
+ if(selected.length)parts.push("Oldingi tanlangan nomlar / Ранее выбранные названия: "+selected.join("; "));
+ if(codes.length)parts.push("Oldingi identifikatorlar / Ранее выбранные коды: "+codes.join(", "));
+ if(dates.length)parts.push("Oldingi davr / Предыдущий период: "+[...new Set(dates)].join(", "));
+ if(!parts.length)return q.slice(0,1500);
+ const prefix=parts.join(". ")+".\n";
+ return prefix.slice(0,Math.max(0,1500-q.length))+q.slice(0,1500);
+}
+function renderReply(r,time,originalQuestion,sourceChat){const t=words[lang];const noValues=r.status==="ok"&&(!r.rows.length||r.rows.every(v=>Object.values(v).every(x=>x==null)));
+ // Fixed errors are always localized synchronously; successful past responses
+ // use cached Gemini display translations (and NEVER mutate their SQL values).
+ const canned = r.status==="unavailable" ? t.unavailable :
+                r.status==="provider_error" ? t.provider :
+                r.status==="error" ? t.retry : null;
+ const translated=localized(r),needTranslate=["ok","clarify"].includes(r.status)&&r.lang!==lang;
+ const displayed = noValues?t.empty:
+    (canned||(needTranslate?(translated?.answer||(sourceChat.turns.find(v=>v.result===r)?.translationFailed===lang?t.translationError:t.translating)):(r.error||r.answer||t.error)));
+ const {wrap,content,bubble}=row("ai",displayed,time,(noValues||["unavailable","error","provider_error"].includes(r.status))?"no-data":"");
+ if(r.status==="ok"&&r.sql&&Array.isArray(r.source)&&r.source.length){
+  const proof=node("div","evidence");proof.append(node("div","source-badge","✓ "+t.source+" · "+r.source.join(", ")));
+  if(r.display_format!=="text" && (r.rows.length>1||(r.rows.length>0&&r.columns.length>1)))proof.append(table(r));
+  if(r.truncated)proof.append(node("p","note",t.cap));const d=node("details");d.append(node("summary","",t.sql),node("p","",r.note),node("pre","",r.sql));
+  if(r.check_sql)d.append(node("p","",t.check),node("pre","",r.check_sql));proof.append(d);bubble.after(proof)
+ }
+ if(r.suggest_new_chat || ["error","provider_error"].includes(r.status)){
+   const hint=node("p","note",t.newChatHint),btn=node("button","action-chip",t.tryFresh);
+   btn.type="button";
+   btn.onclick=()=>{
+      // Capture the question belonging to THIS error bubble, not whatever
+      // happens to be the newest question in the currently selected chat.
+      const q=prepareFreshQuestion(originalQuestion||"",sourceChat);
+      const c=makeChat();chats.unshift(c);choose(c);
+      input.value=q;c.draft=q;resize();controls();save();input.focus();
+   };
+   content.append(hint,btn);
+ }
+ return wrap}
+function renderMessages(animate=false){const m=$("messages");m.replaceChildren();m.append(row("ai",words[lang].welcome).wrap);
+ for(const turn of active.turns){m.append(row("user",turn.question,turn.at).wrap);
+ if(turn.result)m.append(renderReply(turn.result,turn.done,turn.question,active));else if(busy.has(active.id)){const w=row("ai","");w.bubble.classList.add("pending");
+ const dots=node("span","dots");dots.setAttribute("aria-hidden","true");dots.append(node("i"),node("i"),node("i"));w.bubble.append(dots,node("span","",words[lang].wait));m.append(w.wrap)}
+ else m.append(row("ai",words[lang].network,null,"no-data").wrap)}
+ if(animate&&m.lastElementChild){m.lastElementChild.classList.add("arrive");if(busy.has(active.id))m.lastElementChild.previousElementSibling?.classList.add("arrive")}
+ m.scrollTop=m.scrollHeight}
+function resize(){input.style.height="auto";input.style.height=Math.min(120,Math.max(32,input.scrollHeight))+"px"}
+function controls(){const t=words[lang];$("sendBtn").disabled=busy.has(active.id)||!input.value.trim();$("sendBtn").title=t.send;$("sendBtn").setAttribute("aria-label",t.send);input.placeholder=t.hint;input.setAttribute("aria-label",t.hint)}
+function refresh(animate=false){const t=words[lang];document.documentElement.lang=lang;document.querySelectorAll("[data-t]").forEach(n=>n.textContent=t[n.dataset.t]);$("coverage").textContent=coverage.join(" — ");
+ $("menu").setAttribute("aria-label",t.menu);for(const l of ["uz","ru"])$(l).setAttribute("aria-pressed",String(l===lang));
+ const chips=$("chips");chips.replaceChildren();t.chips.forEach((label,i)=>{const b=node("button","action-chip");b.type="button";b.append(icon(["chart","brokers","rate","doc"][i]),node("span","",label));
+ b.onclick=()=>{input.value=t.prompts[i];input.focus();resize();controls()};chips.append(b)});menuList();renderMessages(animate);controls();translateVisible()}
+$("newChat").onclick=()=>{if(!active.turns.length){drawer(false);input.focus();return}const c=makeChat();chats.unshift(c);choose(c)};
+$("menu").onclick=()=>drawer(true);$("backdrop").onclick=()=>drawer(false);document.addEventListener("keydown",e=>{if(e.key==="Escape")drawer(false)});
+for(const l of ["uz","ru"])$(l).onclick=()=>{lang=l;for(const turn of active.turns)delete turn.translationFailed;refresh();save()};
+input.oninput=()=>{active.draft=input.value;resize();controls()};
+input.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("form").requestSubmit()}};
+$("form").onsubmit=async e=>{e.preventDefault();const c=active,question=input.value.trim();if(!question||busy.has(c.id))return;
+ const conversation=c.turns.filter(v=>v.result&&["ok","clarify","unavailable"].includes(v.result.status)).slice(-12).map(v=>({question:v.question,reply:(v.result.answer||"").slice(0,1500),prior_sql:(v.result.sql||"").slice(0,1500),selected_set:v.result.selected_set||[],state:v.result.state||{}}));
+ const requestLang=lang;const turn={question,lang:requestLang,at:Date.now()};c.turns.push(turn);c.draft="";busy.add(c.id);input.value="";resize();refresh(true);save();
+ try{const resp=await fetch("/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,lang:requestLang,conversation})});
+ const r=await resp.json();
+ const currentText=words[requestLang];
+ turn.result=resp.ok?{...r,lang:r.lang||requestLang}:{status:r.status||"error",lang:requestLang,error:resp.status===429?currentText.limit:resp.status===503||resp.status===504?currentText.provider:currentText.retry,suggest_new_chat:!!r.suggest_new_chat || [422,503,504].includes(resp.status)};
+ }catch(err){turn.result={status:"error",lang:requestLang,error:words[requestLang].network,suggest_new_chat:true}}finally{turn.done=Date.now();busy.delete(c.id);save();if(active===c){renderMessages(true);controls();translateVisible()}}};
+input.value=active.draft||"";refresh();fetch("/health").then(r=>r.json()).then(h=>{coverage=h.coverage||[];$("coverage").textContent=coverage.join(" — ")}).catch(()=>{});
+</script></body></html>

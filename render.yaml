@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: bazariq
+    runtime: python
+    plan: starter
+    buildCommand: python -m compileall -q .
+    startCommand: python app.py
+    healthCheckPath: /health
+    envVars:
+      - key: BAZARIQ_PUBLIC
+        value: "1"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.1-flash-lite
+      - key: AI_TIMEOUT
+        value: "25"
+      - key: BAZARIQ_FAST
+        value: "1"
+      - key: BAZARIQ_AUDIT_COMPLEX
+        value: "0"
+      - key: BAZARIQ_RATE_PER_MINUTE
+        value: "30"

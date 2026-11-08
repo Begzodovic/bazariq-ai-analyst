@@ -1,0 +1,153 @@
+{
+  "seed": 714,
+  "mode": "reference",
+  "verified_reference_queries": 11,
+  "cases": [
+    {
+      "kind": "year",
+      "oracle": [
+        [
+          93985
+        ]
+      ],
+      "reference_sql": "SELECT count(*) FROM deals WHERE day >= '2023-01-01' AND day < '2024-01-01'",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "multi_filter",
+      "oracle": [
+        [
+          81
+        ]
+      ],
+      "reference_sql": "SELECT count(*) FROM deals WHERE day >= '2023-02-01' AND day < '2023-03-01' AND region='Navoiy viloyati' AND status='Исполнен'",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "buyer_warehouse",
+      "oracle": [
+        [
+          81
+        ]
+      ],
+      "reference_sql": "SELECT count(*) FROM deals d JOIN participants p ON p.inn=d.buyer_inn WHERE day >= '2023-02-01' AND day < '2023-03-01' AND d.region='Navoiy viloyati' AND p.region<>d.region",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "top",
+      "oracle": [
+        [
+          "Toshkent shahri",
+          699
+        ],
+        [
+          "Sirdaryo viloyati",
+          571
+        ],
+        [
+          "Samarqand viloyati",
+          412
+        ]
+      ],
+      "reference_sql": "SELECT region,count(*) n FROM deals WHERE day >= '2023-02-01' AND day < '2023-03-01' GROUP BY region ORDER BY n DESC,region LIMIT 3",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "bottom",
+      "oracle": [
+        [
+          "BK018",
+          12
+        ],
+        [
+          "BK040",
+          14
+        ],
+        [
+          "BK043",
+          16
+        ]
+      ],
+      "reference_sql": "SELECT buyer_broker,count(*) n FROM deals WHERE day >= '2023-02-01' AND day < '2023-03-01' GROUP BY buyer_broker ORDER BY n,buyer_broker LIMIT 3",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "both_roles",
+      "oracle": [
+        [
+          175
+        ]
+      ],
+      "reference_sql": "SELECT count(*) FROM deals WHERE day >= '2023-02-01' AND day < '2023-03-01' AND (buyer_broker='BK039' OR seller_broker='BK039')",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "converted",
+      "oracle": [
+        [
+          1622599963109.79
+        ]
+      ],
+      "reference_sql": "SELECT round(sum(CASE c.currency WHEN 'Доллар США' THEN d.amount*r.rate ELSE d.amount END),2)\n                 FROM deals d JOIN contracts c ON c.id=d.contract_id JOIN usd_rates r ON r.day=d.day\n                 WHERE d.day >= '2023-02-01' AND d.day < '2023-03-01'",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "weighted",
+      "oracle": [
+        [
+          4766470.14
+        ]
+      ],
+      "reference_sql": "SELECT round(sum(d.amount)/nullif(sum(d.quantity*d.lot),0),2) FROM deals d\n                 JOIN contracts c ON c.id=d.contract_id WHERE day >= '2023-02-01' AND day < '2023-03-01' AND d.unit='тонна' AND c.currency='Узбекский сум'",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "yoy",
+      "oracle": [
+        [
+          11.49
+        ]
+      ],
+      "reference_sql": "WITH y AS (SELECT substr(day,1,4) yr,count(*) n FROM deals GROUP BY 1)\n                 SELECT round(100.0*(b.n-a.n)/nullif(a.n,0),2) FROM y a,y b WHERE a.yr='2022' AND b.yr='2023'",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "nested",
+      "oracle": [
+        [
+          249
+        ]
+      ],
+      "reference_sql": "SELECT count(*) FROM (SELECT buyer_inn FROM deals WHERE day >= '2023-02-01' AND day < '2023-03-01' GROUP BY buyer_inn HAVING count(DISTINCT seller_inn)>=3)",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "empty",
+      "oracle": [
+        [
+          0
+        ]
+      ],
+      "reference_sql": "SELECT count(*) FROM deals WHERE day >= '2023-02-01' AND day < '2023-03-01' AND delivery_day < payment_day",
+      "expected_status": "ok"
+    },
+    {
+      "kind": "clarify",
+      "oracle": [],
+      "reference_sql": "",
+      "expected_status": "clarify"
+    },
+    {
+      "kind": "missing",
+      "oracle": [],
+      "reference_sql": "",
+      "expected_status": "unavailable"
+    },
+    {
+      "kind": "coverage",
+      "oracle": [],
+      "reference_sql": "",
+      "expected_status": "unavailable"
+    }
+  ]
+}
